@@ -9,6 +9,7 @@ package kinepolis;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -18,6 +19,7 @@ public class InlogScherm extends javax.swing.JFrame {
     Connection con;
     BalieMedewerkerScherm balie = new BalieMedewerkerScherm();
     BeheerderScherm beheerder = new BeheerderScherm();
+    VerantwoordelijkeScherm verantwoordelijke = new VerantwoordelijkeScherm();
 
     /**
      * Creates new form InlogScherm
@@ -148,24 +150,38 @@ public class InlogScherm extends javax.swing.JFrame {
     private void btnInloggenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInloggenActionPerformed
         // TODO add your handling code here:
         con = Connectie.connect();
-        String sql = "select * from personeel where Account='"+txtAccountInloggen.getText()+"'"+" and Paswoord='"+(String)txtPaswoordInloggen.getText()+"'";
+        String sql = "select * from personeel";
         
         try {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next() && rs.getString("Functie").equals("Beheerder")){
-                beheerder.setVisible(true);
-            }
-            
-            else if(rs.next() && rs.getString("Functie").equals("Balie")){
+            while (rs.next()) {  
+                if(rs.getString("Account").equals(txtAccountInloggen.getText()) && rs.getString("Paswoord").equals((String)txtPaswoordInloggen.getText()) 
+                        && rs.getString("Functie").equals("Balie"))
+                {
                 balie.setVisible(true);
-            }
-            else if(rs.next() && rs.getString("Functie").equals("Test")){
+                break;
+                }
+                else if(rs.getString("Account").equals(txtAccountInloggen.getText()) && rs.getString("Paswoord").equals((String)txtPaswoordInloggen.getText()) 
+                        && rs.getString("Functie").equals("Beheerder"))
+                {
+                beheerder.setVisible(true);
+                break;
+                }
+                else if(rs.getString("Account").equals(txtAccountInloggen.getText()) && rs.getString("Paswoord").equals((String)txtPaswoordInloggen.getText()) 
+                        && rs.getString("Functie").equals("Verantwoordelijke"))
+                {
+                verantwoordelijke.setVisible(true);
+                break;
+                }  
                 
+            } 
+            if(!rs.next()){
+                JOptionPane.showMessageDialog(null, "Foutieve inloggegevens!");
             }
-            
             
         } catch (Exception e) {
+            
         }
         
     }//GEN-LAST:event_btnInloggenActionPerformed
