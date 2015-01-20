@@ -1,5 +1,5 @@
-[Fri Jan 16 12:47:02.093584 2015] [mpm_winnt:notice] [pid 11716:tid 496] AH00455: Apache/2.4.6 (Win32) PHP/5.4.17 configured -- resuming normal operations
-[Fri Jan 16 12:47:02.094585 2015] [mpm_winnt:notice] [pid 11716:tid 496] AH00456: Apache Lounge VC10 Server built: Jul 16 2013 11:15:41
-[Fri Jan 16 12:47:02.094585 2015] [core:notice] [pid 11716:tid 496] AH00094: Command line: 'C:\\Users\\Mohamed\\Desktop\\ProjectKinepolis\\Code\\USBWebserver\\USBWebserver v8.6/apache2/bin/httpd_usbwv8.exe -d C:/Users/Mohamed/Desktop/ProjectKinepolis/Code/USBWebserver/USBWebserver v8.6/apache2'
-[Fri Jan 16 12:47:02.153906 2015] [mpm_winnt:notice] [pid 11716:tid 496] AH00418: Parent: Created child process 13304
-[Fri Jan 16 12:47:03.998107 2015] [mpm_winnt:notice] [pid 13304:tid 496] AH00354: Child: Starting 64 worker threads.
+[Tue Jan 20 20:07:28.527629 2015] [mpm_winnt:notice] [pid 5372:tid 484] AH00455: Apache/2.4.6 (Win32) PHP/5.4.17 configured -- resuming normal operations
+[Tue Jan 20 20:07:28.528630 2015] [mpm_winnt:notice] [pid 5372:tid 484] AH00456: Apache Lounge VC10 Server built: Jul 16 2013 11:15:41
+[Tue Jan 20 20:07:28.528630 2015] [core:notice] [pid 5372:tid 484] AH00094: Command line: 'C:\\Users\\Mohamed\\Desktop\\ProjectKinepolis\\Code\\USBWebserver\\USBWebserver v8.6/apache2/bin/httpd_usbwv8.exe -d C:/Users/Mohamed/Desktop/ProjectKinepolis/Code/USBWebserver/USBWebserver v8.6/apache2'
+[Tue Jan 20 20:07:28.560633 2015] [mpm_winnt:notice] [pid 5372:tid 484] AH00418: Parent: Created child process 10724
+[Tue Jan 20 20:07:31.315985 2015] [mpm_winnt:notice] [pid 10724:tid 508] AH00354: Child: Starting 64 worker threads.
