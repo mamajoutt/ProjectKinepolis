@@ -94,6 +94,8 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Films beheren", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
+
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Titel");
 
@@ -119,21 +121,24 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
 
         dchUitgiftejaarFilmToevoegen.setDateFormatString("dd-MM-yyyy");
 
-        btnFotoFilmToevoegen.setText("Upload foto");
+        btnFotoFilmToevoegen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/uploaden.png"))); // NOI18N
+        btnFotoFilmToevoegen.setText("Foto");
         btnFotoFilmToevoegen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFotoFilmToevoegenActionPerformed(evt);
             }
         });
 
-        btnFilmOpslaan.setText("Film toevoegen");
+        btnFilmOpslaan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/toevoegen.png"))); // NOI18N
+        btnFilmOpslaan.setText("Toevoegen");
         btnFilmOpslaan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFilmOpslaanActionPerformed(evt);
             }
         });
 
-        btnFilmWijzigen.setText("Film wijzigen");
+        btnFilmWijzigen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wijziging opslaan.png"))); // NOI18N
+        btnFilmWijzigen.setText("Wijzigen");
         btnFilmWijzigen.setEnabled(false);
         btnFilmWijzigen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -141,7 +146,8 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
             }
         });
 
-        btnFilmVerwijderen.setText("Film verwijderen");
+        btnFilmVerwijderen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        btnFilmVerwijderen.setText("Verwijderen");
         btnFilmVerwijderen.setEnabled(false);
         btnFilmVerwijderen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -151,6 +157,7 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
 
         jLabel8.setText("/10");
 
+        lblFilmID.setForeground(new java.awt.Color(240, 240, 240));
         lblFilmID.setToolTipText("");
 
         FilmTabel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -218,19 +225,19 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
                                         .addComponent(txtAfspeelduurFilmToevoegen, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32)
-                        .addComponent(lblFotoFilmTonen, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnFotoFilmToevoegen)
-                        .addGap(107, 107, 107))))
+                        .addGap(107, 107, 107))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblFotoFilmTonen, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(88, 88, 88))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26))
         );
@@ -288,8 +295,9 @@ public class VerantwoordelijkeScherm extends javax.swing.JFrame {
                             .addComponent(btnFilmOpslaan))
                         .addGap(77, 77, 77))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
                         .addComponent(lblFotoFilmTonen, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnFotoFilmToevoegen)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );

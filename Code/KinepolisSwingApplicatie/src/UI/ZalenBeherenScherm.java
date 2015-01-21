@@ -103,6 +103,7 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
         jScrollPane1.setViewportView(ZaalTabel);
 
         btnZaalVerwijderen.setText("Zaal verwijderen");
+        btnZaalVerwijderen.setEnabled(false);
         btnZaalVerwijderen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnZaalVerwijderenActionPerformed(evt);
@@ -110,6 +111,7 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
         });
 
         btnZaalWijzigen.setText("Zaal wijzigen");
+        btnZaalWijzigen.setEnabled(false);
         btnZaalWijzigen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnZaalWijzigenActionPerformed(evt);
@@ -130,6 +132,8 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
         jLabel2.setText("Aantal zitplaatsen");
 
         cbxAantalZitplaatsenZaalToevoegen.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "50", "60", "70", "80", "90", "100", "110", "120", "130", "140", "150", "160", "170", "180", "190", "200", "225", "250", "275", "300", " " }));
+
+        lblZaalID.setForeground(new java.awt.Color(240, 240, 240));
 
         chk3DCompatibelZaalToevoegen.setText("3D compatibel?");
 
@@ -294,7 +298,7 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
         lblZaalID.setText("" + ZaalTabel.getModel().getValueAt(rij, 0));
         txtLocatieZaalToevoegen.setText((String)ZaalTabel.getModel().getValueAt(rij, 1));
         cbxAantalZitplaatsenZaalToevoegen.setSelectedItem("" + ZaalTabel.getModel().getValueAt(rij, 2));
-        String is3DZaal = ((String)ZaalTabel.getModel().getValueAt(rij, 4));
+        String is3DZaal = ((String)ZaalTabel.getModel().getValueAt(rij, 3));
         if(is3DZaal.equals("true")){
             chk3DCompatibelZaalToevoegen.setSelected(true);
         }

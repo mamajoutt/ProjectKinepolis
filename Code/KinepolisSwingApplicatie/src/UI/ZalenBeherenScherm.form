@@ -162,6 +162,7 @@
         <Component class="javax.swing.JButton" name="btnZaalVerwijderen">
           <Properties>
             <Property name="text" type="java.lang.String" value="Zaal verwijderen"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZaalVerwijderenActionPerformed"/>
@@ -170,6 +171,7 @@
         <Component class="javax.swing.JButton" name="btnZaalWijzigen">
           <Properties>
             <Property name="text" type="java.lang.String" value="Zaal wijzigen"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnZaalWijzigenActionPerformed"/>
@@ -227,6 +229,11 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblZaalID">
+          <Properties>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="f0" green="f0" red="f0" type="rgb"/>
+            </Property>
+          </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chk3DCompatibelZaalToevoegen">
           <Properties>
