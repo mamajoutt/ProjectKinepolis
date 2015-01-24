@@ -5,17 +5,44 @@
  */
 package UI;
 
+import Services.CheckInputVoorstellingen;
+import java.awt.Image;
+import static java.awt.image.ImageObserver.WIDTH;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.Vector;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Mohamed
  */
 public class BeheerderScherm extends javax.swing.JFrame {
+    Connection conn;
+    CheckInputVoorstellingen chkInputVoorstellingen = new CheckInputVoorstellingen();
+    PreparedStatement ps;
+    Statement st,st2,st3,st4,st5;
+    ResultSet rs,rs2,rs1,rs3,rs4,rs5;
+    DefaultTableModel dtm;
+    int voorsid,filmid,zaalid;
+    java.util.Date datum;
+    java.sql.Date datumConvertToDB;
 
     /**
      * Creates new form BeheerderScherm
      */
     public BeheerderScherm() {
         initComponents();
+        filmTitelsOphalen();
+        zaalLocatiesOphalen();
+        vulVoorstellingTabel();
     }
 
     /**
@@ -37,21 +64,29 @@ public class BeheerderScherm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtPrijsVoorstelling = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jDateChooser1 = new com.toedter.calendar.JDateChooser();
-        jComboBox1 = new javax.swing.JComboBox();
+        dchDatumVoorstelling = new com.toedter.calendar.JDateChooser();
+        cbxTijdstipVoorstelling = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnVoorstellingWijzigen = new javax.swing.JButton();
+        btnVoorstellingVerwijderen = new javax.swing.JButton();
+        btnVoorstellingToevoegen = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        btnZalenBeheren = new javax.swing.JButton();
+        lblFoto = new javax.swing.JLabel();
         lblVoorstellingID = new javax.swing.JLabel();
+        btnZalenBeheren = new javax.swing.JButton();
+        lblFilmID = new javax.swing.JLabel();
+        lblZaalID = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Voorstellingen beheren", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel1MouseClicked(evt);
+            }
+        });
 
         VoorstellingTabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -70,6 +105,11 @@ public class BeheerderScherm extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4", "Title 5", "Title 6"
             }
         ));
+        VoorstellingTabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                VoorstellingTabelMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(VoorstellingTabel);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -83,7 +123,7 @@ public class BeheerderScherm extends javax.swing.JFrame {
 
         jLabel4.setText("€");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10:45", "13:45", "14:00", "14:15", "14:45", "16:45", "17:00", "17:15", "19:15", "19:30", "19:45", "20:00", "20:30", "20:45", "22:15", "22:30" }));
+        cbxTijdstipVoorstelling.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10:45", "13:45", "14:00", "14:15", "14:45", "16:45", "17:00", "17:15", "19:15", "19:30", "19:45", "20:00", "20:30", "20:45", "22:15", "22:30" }));
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Datum");
@@ -91,83 +131,115 @@ public class BeheerderScherm extends javax.swing.JFrame {
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Tijdstip");
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wijziging opslaan.png"))); // NOI18N
-        jButton1.setText("Wijzigen");
+        btnVoorstellingWijzigen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wijziging opslaan.png"))); // NOI18N
+        btnVoorstellingWijzigen.setText("Wijzigen");
+        btnVoorstellingWijzigen.setEnabled(false);
+        btnVoorstellingWijzigen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoorstellingWijzigenActionPerformed(evt);
+            }
+        });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
-        jButton2.setText("Verwijderen");
+        btnVoorstellingVerwijderen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        btnVoorstellingVerwijderen.setText("Verwijderen");
+        btnVoorstellingVerwijderen.setEnabled(false);
+        btnVoorstellingVerwijderen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoorstellingVerwijderenActionPerformed(evt);
+            }
+        });
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/toevoegen.png"))); // NOI18N
-        jButton3.setText("Toevoegen");
-
-        btnZalenBeheren.setText("Zalen beheren");
+        btnVoorstellingToevoegen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/toevoegen.png"))); // NOI18N
+        btnVoorstellingToevoegen.setText("Toevoegen");
+        btnVoorstellingToevoegen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoorstellingToevoegenActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnZalenBeheren, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(28, 28, 28)
+                .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnZalenBeheren, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
+
+        lblVoorstellingID.setForeground(new java.awt.Color(240, 240, 240));
+
+        btnZalenBeheren.setText("Zalen beheren");
+        btnZalenBeheren.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnZalenBeherenActionPerformed(evt);
+            }
+        });
+
+        lblZaalID.setForeground(new java.awt.Color(240, 240, 240));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
+                .addGap(41, 41, 41)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxFilmVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(dchDatumVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbxZaalVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbxFilmVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblZaalID)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtPrijsVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cbxZaalVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtPrijsVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(81, 81, 81)
-                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton2)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton3)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGap(81, 81, 81)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbxTijdstipVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnVoorstellingWijzigen)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnVoorstellingVerwijderen)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnVoorstellingToevoegen)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel4)
-                            .addComponent(lblVoorstellingID))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(lblVoorstellingID)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblFilmID, javax.swing.GroupLayout.DEFAULT_SIZE, 1, Short.MAX_VALUE)))
+                        .addGap(0, 0, 0)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnZalenBeheren, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(51, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -175,34 +247,41 @@ public class BeheerderScherm extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cbxFilmVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1)
-                            .addComponent(lblVoorstellingID))
+                            .addComponent(lblVoorstellingID)
+                            .addComponent(lblFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(cbxZaalVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtPrijsVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3)
-                            .addComponent(jLabel4)))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                            .addComponent(jLabel4)
+                            .addComponent(lblZaalID))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(dchDatumVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(cbxTijdstipVoorstelling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel6))
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(14, 14, 14))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel6))
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
-                .addGap(27, 27, 27))
+                        .addComponent(btnVoorstellingToevoegen)
+                        .addComponent(btnVoorstellingVerwijderen)
+                        .addComponent(btnVoorstellingWijzigen))
+                    .addComponent(btnZalenBeheren, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -222,10 +301,236 @@ public class BeheerderScherm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        setSize(new java.awt.Dimension(805, 469));
+        setSize(new java.awt.Dimension(805, 507));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnZalenBeherenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZalenBeherenActionPerformed
+        // TODO add your handling code here:
+        dispose();
+        ZalenBeherenScherm zalenBeherenScherm = new ZalenBeherenScherm();
+        
+        zalenBeherenScherm.setVisible(true);
+    }//GEN-LAST:event_btnZalenBeherenActionPerformed
+
+    private void btnVoorstellingWijzigenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoorstellingWijzigenActionPerformed
+        // TODO add your handling code here:
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        voorstellingIDOphalen();
+        filmIDOphalen();
+        zaalIDOphalen();
+        try {
+            String sql="update voorstellingen set FilmID=?,ZaalID=?,Prijs=?,Datum=?,Tijdstip=? where VoorstellingID=?";
+            ps=conn.prepareStatement(sql);
+            ps.setInt(6, Integer.parseInt(lblVoorstellingID.getText()));
+            ps.setInt(1, filmid);
+            ps.setInt(2, zaalid);
+            ps.setDouble(3, Double.parseDouble(txtPrijsVoorstelling.getText()));
+            datum = dchDatumVoorstelling.getDate();
+            datumConvertToDB = new java.sql.Date(datum.getTime());
+            ps.setDate(4, datumConvertToDB);
+            ps.setString(5,(String)cbxTijdstipVoorstelling.getSelectedItem());
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Voorstelling met filmtitel " + cbxFilmVoorstelling.getSelectedItem()+  " gewijzigd!");
+            vulVoorstellingTabel();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Er is een fout gebeurd tijdens het wijzigen van de voorstelling.");
+        }
+        
+    }//GEN-LAST:event_btnVoorstellingWijzigenActionPerformed
+
+    private void btnVoorstellingToevoegenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoorstellingToevoegenActionPerformed
+        // TODO add your handling code here:
+        if(chkInputVoorstellingen.controleerPlanningTijdstip(zaalid, (String)cbxZaalVoorstelling.getSelectedItem()) == true){
+        JOptionPane.showMessageDialog(null,"Twee films kunnen niet tegelijk afspelen in de zelfde zaal!","ok",JOptionPane.ERROR_MESSAGE);
+           return;  
+        }
+//        if(chkInputVoorstellingen.controleer3DCompabiliteit(filmid,zaalid)==true){
+//           JOptionPane.showMessageDialog(null,"Deze film is niet 3D compatibel!!","ok",JOptionPane.ERROR_MESSAGE);
+//           return;
+//        }
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        voorstellingIDOphalen();
+        filmIDOphalen();
+        zaalIDOphalen();
+        try {
+            String sql="insert into voorstellingen values (?,?,?,?,?,?)";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, voorsid);
+            ps.setInt(2, filmid);
+            ps.setInt(3, zaalid);
+            ps.setDouble(4, Double.parseDouble(txtPrijsVoorstelling.getText()));
+            datum = dchDatumVoorstelling.getDate();
+            datumConvertToDB = new java.sql.Date(datum.getTime());
+            ps.setDate(5, datumConvertToDB);
+            ps.setString(6, (String)cbxTijdstipVoorstelling.getSelectedItem());
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Voorstelling toegevoegd!");
+            vulVoorstellingTabel();
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnVoorstellingToevoegenActionPerformed
+
+    private void VoorstellingTabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VoorstellingTabelMouseClicked
+        // TODO add your handling code here:
+        btnVoorstellingWijzigen.setEnabled(true);
+        btnVoorstellingVerwijderen.setEnabled(true);
+        btnVoorstellingToevoegen.setEnabled(false);
+        
+        int rij = VoorstellingTabel.getSelectedRow();
+        
+        lblVoorstellingID.setText(""+VoorstellingTabel.getModel().getValueAt(rij, 0));
+        lblFilmID.setText(""+VoorstellingTabel.getModel().getValueAt(rij, 1));
+        cbxFilmVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 2));
+        lblZaalID.setText(""+VoorstellingTabel.getModel().getValueAt(rij, 3));
+        cbxZaalVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 4));
+        txtPrijsVoorstelling.setText(""+VoorstellingTabel.getModel().getValueAt(rij, 5));
+        dchDatumVoorstelling.setDate((Date)VoorstellingTabel.getModel().getValueAt(rij, 6));
+        cbxTijdstipVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 2));
+        FotoOpvragen(Integer.parseInt(lblFilmID.getText()));
+    }//GEN-LAST:event_VoorstellingTabelMouseClicked
+
+    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+        // TODO add your handling code here:
+        btnVoorstellingWijzigen.setEnabled(false);
+        btnVoorstellingVerwijderen.setEnabled(false);
+        btnVoorstellingToevoegen.setEnabled(true);
+
+    }//GEN-LAST:event_jPanel1MouseClicked
+
+    private void btnVoorstellingVerwijderenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoorstellingVerwijderenActionPerformed
+        // TODO add your handling code here:
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "Delete from voorstellingen where VoorstellingID=?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(lblVoorstellingID.getText()));
+            ps.execute();
+            JOptionPane.showMessageDialog(null, "Voorstelling verwijderd!");
+            vulVoorstellingTabel();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+    }//GEN-LAST:event_btnVoorstellingVerwijderenActionPerformed
+
+    void vulVoorstellingTabel(){
+        try {
+            conn = kinepolisswingapplicatie.Connectie.connect();
+            
+            Vector kolomNamen = new Vector(); 
+            Vector gegevens = new Vector();
+//            String sql = "select * from voorstellingen";
+            String sql="select voorstellingen.VoorstellingID,films.FilmID, films.Titel,zalen.ZaalID, zalen.Locatie,voorstellingen.Prijs,voorstellingen.Datum,voorstellingen.Tijdstip from voorstellingen,films,zalen where films.FilmID=voorstellingen.FilmID and zalen.ZaalID=voorstellingen.ZaalID order by VoorstellingID ";
+            java.sql.Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            ResultSetMetaData metaData = rs.getMetaData();
+            int kolommen = metaData.getColumnCount();
+            for (int i = 1; i <= kolommen; i++) {               
+                 kolomNamen.addElement(metaData.getColumnName(i));    
+            }
+            while(rs.next()){
+                Vector rij = new Vector(kolommen);
+                for(int i = 1; i<=kolommen;i++){
+                    rij.addElement(rs.getObject(i));
+                }
+                gegevens.addElement(rij);
+            }
+            
+            dtm = new DefaultTableModel(gegevens, kolomNamen );
+            VoorstellingTabel.setModel(dtm);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+    }
+    
+    void filmTitelsOphalen(){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "select Titel from films ORDER BY Titel";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                cbxFilmVoorstelling.addItem(rs.getString("Titel"));
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    void zaalLocatiesOphalen(){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "select Locatie from zalen ORDER BY Locatie";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                cbxZaalVoorstelling.addItem(rs.getString("Locatie"));
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    void voorstellingIDOphalen(){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "select ifnull(max(VoorstellingID)+1,1) from voorstellingen";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                voorsid = rs.getInt(1);
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    void filmIDOphalen(){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "select FilmID from films where Titel='"+(String)cbxFilmVoorstelling.getSelectedItem()+"'";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                filmid = rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+    
+    void zaalIDOphalen(){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql = "select ZaalID from zalen where Locatie='"+(String)cbxZaalVoorstelling.getSelectedItem()+"'";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+                zaalid = rs.getInt(1);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+    
+    void FotoOpvragen(int id){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql ="select Foto from films where FilmID='"+id+"'";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+               Image im = ImageIO.read(rs.getBinaryStream("Foto"));
+               Image im1 = im.getScaledInstance(lblFoto.getHeight(), lblFoto.getWidth(), WIDTH);
+               lblFoto.setIcon(new ImageIcon(im1));
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
     /**
      * @param args the command line arguments
      */
@@ -263,14 +568,14 @@ public class BeheerderScherm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable VoorstellingTabel;
+    private javax.swing.JButton btnVoorstellingToevoegen;
+    private javax.swing.JButton btnVoorstellingVerwijderen;
+    private javax.swing.JButton btnVoorstellingWijzigen;
     private javax.swing.JButton btnZalenBeheren;
     private javax.swing.JComboBox cbxFilmVoorstelling;
+    private javax.swing.JComboBox cbxTijdstipVoorstelling;
     private javax.swing.JComboBox cbxZaalVoorstelling;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox jComboBox1;
-    private com.toedter.calendar.JDateChooser jDateChooser1;
+    private com.toedter.calendar.JDateChooser dchDatumVoorstelling;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -280,7 +585,10 @@ public class BeheerderScherm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblFilmID;
+    private javax.swing.JLabel lblFoto;
     private javax.swing.JLabel lblVoorstellingID;
+    private javax.swing.JLabel lblZaalID;
     private javax.swing.JTextField txtPrijsVoorstelling;
     // End of variables declaration//GEN-END:variables
 }

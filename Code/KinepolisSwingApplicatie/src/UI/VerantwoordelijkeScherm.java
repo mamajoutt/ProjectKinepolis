@@ -21,7 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import kinepolisswingapplicatie.Connectie;
-import kinepolisswingapplicatie.TabelModel;
 
 /**
  *
