@@ -7,6 +7,7 @@ package UI;
 
 import UI.BeheerderScherm;
 import UI.BalieMedewerkerScherm;
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -28,6 +29,7 @@ public class InlogScherm extends javax.swing.JFrame {
      */
     public InlogScherm() {
         initComponents();
+        maakVerbindingDatabase();
     }
 
     /**
@@ -46,16 +48,19 @@ public class InlogScherm extends javax.swing.JFrame {
         btnInloggen = new javax.swing.JButton();
         btnAfsluiten = new javax.swing.JButton();
         txtPaswoordInloggen = new javax.swing.JPasswordField();
+        lblDBConnectiviteit = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 204));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(0, 0, 204));
+        jPanel1.setBackground(new java.awt.Color(135, 206, 235));
 
         lblAccount.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblAccount.setForeground(new java.awt.Color(255, 255, 255));
         lblAccount.setText("Account");
+
+        txtAccountInloggen.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         lblPaswoord.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblPaswoord.setForeground(new java.awt.Color(255, 255, 255));
@@ -74,6 +79,11 @@ public class InlogScherm extends javax.swing.JFrame {
                 btnAfsluitenActionPerformed(evt);
             }
         });
+
+        txtPaswoordInloggen.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        lblDBConnectiviteit.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lblDBConnectiviteit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -94,9 +104,10 @@ public class InlogScherm extends javax.swing.JFrame {
                         .addComponent(btnAfsluiten, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(33, 33, 33)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPaswoordInloggen, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtAccountInloggen, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtPaswoordInloggen, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                            .addComponent(txtAccountInloggen, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                            .addComponent(lblDBConnectiviteit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(61, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -114,7 +125,9 @@ public class InlogScherm extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnInloggen, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAfsluiten, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblDBConnectiviteit, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -159,13 +172,20 @@ public class InlogScherm extends javax.swing.JFrame {
                     verantwoordelijke.setVisible(true);
                     break;
                 }
+                lblDBConnectiviteit.setOpaque(true);
+                lblDBConnectiviteit.setBackground(Color.GREEN);
+                lblDBConnectiviteit.setText("DATABASE ONLINE");
 
             }
-            if(!rs.next()){
+        if(!rs.next()){
                 JOptionPane.showMessageDialog(null, "Foutieve inloggegevens!");
-            }
+        }
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+            lblDBConnectiviteit.setOpaque(true);
+            lblDBConnectiviteit.setBackground(Color.RED);
+            lblDBConnectiviteit.setText("DATABASE OFFLINE");
 
         }
 
@@ -176,6 +196,21 @@ public class InlogScherm extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_btnAfsluitenActionPerformed
 
+    void maakVerbindingDatabase(){
+        try {
+            conn = Connectie.connect();
+            
+            lblDBConnectiviteit.setOpaque(true);
+            lblDBConnectiviteit.setBackground(Color.GREEN);
+            lblDBConnectiviteit.setText("DATABASE ONLINE");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            lblDBConnectiviteit.setOpaque(true);
+            lblDBConnectiviteit.setBackground(Color.RED);
+            lblDBConnectiviteit.setText("DATABASE OFFLINE");
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -216,6 +251,7 @@ public class InlogScherm extends javax.swing.JFrame {
     private javax.swing.JButton btnInloggen;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccount;
+    private javax.swing.JLabel lblDBConnectiviteit;
     private javax.swing.JLabel lblPaswoord;
     private javax.swing.JTextField txtAccountInloggen;
     private javax.swing.JPasswordField txtPaswoordInloggen;

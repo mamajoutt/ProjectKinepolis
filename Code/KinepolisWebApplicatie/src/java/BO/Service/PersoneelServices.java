@@ -16,13 +16,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author Mohamed
  */
 public class PersoneelServices {
+    
+    public static boolean loginValideren(String account, String paswoord){
+        boolean status = false;
+        Connection conn = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3307/kinepolisdb","root", "usbw");
+            
+            pst = conn.prepareStatement("select * from personeel where Account=? and Paswoord=? and Functie=?");
+            pst.setString(1, account);
+            pst.setString(2, paswoord);
+            pst.setString(3, "Verantwoordelijke");
+            
+            rs = pst.executeQuery();
+            status = rs.next();
+            
+            
+            
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            if (conn != null) {  
+                try {  
+                    conn.close();  
+                } catch (SQLException ex) {  
+                    System.out.println(ex.getMessage());  
+                }  
+            }  
+            if (pst != null) {  
+                try {  
+                    pst.close();  
+                } catch (SQLException ex) {  
+                    System.out.println(ex.getMessage());  
+                }  
+            }  
+            if (rs != null) {  
+                try {  
+                    rs.close();  
+                } catch (SQLException ex) {  
+                    System.out.println(ex.getMessage()); 
+                }  
+            } 
+            
+        }
+        return status;
+    }
     
     public List<Personeel> personeelLijstOphalen(){
         List<Personeel> personeelLijst = new ArrayList<>();

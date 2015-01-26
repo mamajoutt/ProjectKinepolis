@@ -14,7 +14,7 @@
     <body>
     <center>
         <div id="hoofding" style="border: none;">
-            <h1>Welkom op de webapplicatie van Kinepolis!</h1>
+            <h1>Welkom <%=session.getAttribute("account")%> op de webapplicatie van Kinepolis!</h1>
             <p>
                 <%=new Date()%><br> <br>
             <a href="persLijstTonen.jsp">Personeelslijst</a><br>
