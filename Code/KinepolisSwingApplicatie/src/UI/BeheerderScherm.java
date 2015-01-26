@@ -28,8 +28,8 @@ public class BeheerderScherm extends javax.swing.JFrame {
     Connection conn;
     CheckInputVoorstellingen chkInputVoorstellingen = new CheckInputVoorstellingen();
     PreparedStatement ps;
-    Statement st,st2,st3,st4,st5;
-    ResultSet rs,rs2,rs1,rs3,rs4,rs5;
+    Statement st;
+    ResultSet rs;
     DefaultTableModel dtm;
     int voorsid,filmid,zaalid;
     java.util.Date datum;
@@ -386,7 +386,7 @@ public class BeheerderScherm extends javax.swing.JFrame {
         cbxZaalVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 4));
         txtPrijsVoorstelling.setText(""+VoorstellingTabel.getModel().getValueAt(rij, 5));
         dchDatumVoorstelling.setDate((Date)VoorstellingTabel.getModel().getValueAt(rij, 6));
-        cbxTijdstipVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 2));
+        cbxTijdstipVoorstelling.setSelectedItem((String)VoorstellingTabel.getModel().getValueAt(rij, 7));
         FotoOpvragen(Integer.parseInt(lblFilmID.getText()));
     }//GEN-LAST:event_VoorstellingTabelMouseClicked
 
@@ -420,7 +420,7 @@ public class BeheerderScherm extends javax.swing.JFrame {
             Vector kolomNamen = new Vector(); 
             Vector gegevens = new Vector();
 //            String sql = "select * from voorstellingen";
-            String sql="select voorstellingen.VoorstellingID,films.FilmID, films.Titel,zalen.ZaalID, zalen.Locatie,voorstellingen.Prijs,voorstellingen.Datum,voorstellingen.Tijdstip from voorstellingen,films,zalen where films.FilmID=voorstellingen.FilmID and zalen.ZaalID=voorstellingen.ZaalID order by VoorstellingID ";
+            String sql="select voorstellingen.VoorstellingID, films.FilmID, films.Titel, zalen.ZaalID, zalen.Locatie, voorstellingen.Prijs, voorstellingen.Datum, voorstellingen.Tijdstip from voorstellingen,films,zalen where films.FilmID=voorstellingen.FilmID and zalen.ZaalID=voorstellingen.ZaalID order by VoorstellingID ";
             java.sql.Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             ResultSetMetaData metaData = rs.getMetaData();

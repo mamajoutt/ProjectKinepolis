@@ -5,17 +5,38 @@
  */
 package UI;
 
+import java.awt.Image;
+import static java.awt.image.ImageObserver.WIDTH;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.Vector;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
+import kinepolisswingapplicatie.Connectie;
+
 /**
  *
  * @author Mohamed
  */
 public class BalieMedewerkerScherm extends javax.swing.JFrame {
-
+    Connection conn;
+    Statement st;
+    ResultSet rs;
+    DefaultTableModel dtm;
+    
     /**
      * Creates new form BalieMedewerkerScherm
      */
     public BalieMedewerkerScherm() {
         initComponents();
+        vulVoorstellingTabel();
     }
 
     /**
@@ -31,7 +52,6 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtFilmID = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        txtFilmTitel = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtZaalLocatie = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -43,14 +63,18 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         txtVoorstellingPrijs = new javax.swing.JTextField();
-        spAantalTickets = new javax.swing.JSpinner();
+        SpinnerModel model = new SpinnerNumberModel(10, 0, 20, 1);
+        spAantalTickets = new javax.swing.JSpinner(model);
         jLabel11 = new javax.swing.JLabel();
-        txtTotaalPrijs = new javax.swing.JTextField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        chk3DFilm = new javax.swing.JCheckBox();
         lblFilmFoto = new javax.swing.JLabel();
         btnPrintTicket = new javax.swing.JButton();
+        lblFilmTitel = new javax.swing.JLabel();
+        lblTotaalPrijs = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        txtaPrintTicket = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        balieVoorstellingTabel = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Kinepolis Antwerpen");
@@ -69,15 +93,12 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel4.setText("Titel");
 
-        txtFilmTitel.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        txtFilmTitel.setEnabled(false);
-
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel5.setText("Zaal");
 
         txtZaalLocatie.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        txtZaalLocatie.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtZaalLocatie.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         txtZaalLocatie.setEnabled(false);
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -117,24 +138,49 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
         txtVoorstellingPrijs.setEnabled(false);
 
         spAantalTickets.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        spAantalTickets.setEnabled(false);
         spAantalTickets.setValue(1
         );
+        spAantalTickets.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spAantalTicketsStateChanged(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel11.setText("Totaalprijs:");
         jLabel11.setPreferredSize(new java.awt.Dimension(20, 14));
 
-        txtTotaalPrijs.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        txtTotaalPrijs.setEnabled(false);
-
-        jCheckBox1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jCheckBox1.setText("3D?");
-        jCheckBox1.setEnabled(false);
+        chk3DFilm.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        chk3DFilm.setText("3D?");
+        chk3DFilm.setEnabled(false);
 
         btnPrintTicket.setBackground(new java.awt.Color(51, 255, 51));
         btnPrintTicket.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btnPrintTicket.setText("Print ticket");
+        btnPrintTicket.setEnabled(false);
+        btnPrintTicket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintTicketActionPerformed(evt);
+            }
+        });
+
+        lblFilmTitel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        lblFilmTitel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        lblTotaalPrijs.setBackground(new java.awt.Color(0, 255, 0));
+        lblTotaalPrijs.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lblTotaalPrijs.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblTotaalPrijs.setOpaque(true);
+
+        txtaPrintTicket.setBackground(new java.awt.Color(240, 240, 240));
+        txtaPrintTicket.setColumns(20);
+        txtaPrintTicket.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtaPrintTicket.setRows(5);
+        txtaPrintTicket.setBorder(null);
+        txtaPrintTicket.setOpaque(false);
+        jScrollPane1.setViewportView(txtaPrintTicket);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -142,48 +188,57 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jCheckBox1))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtFilmTitel)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(txtZaalLocatie, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtZaalAantalPlaatsen, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtVoorstellingPrijs))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(dchVoorstellingDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(64, 64, 64)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtVoorstellingTijdstip, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(223, 223, 223)
+                                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtTotaalPrijs, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(spAantalTickets, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(spAantalTickets, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(44, 44, 44))
+                            .addComponent(lblTotaalPrijs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(chk3DFilm))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(txtZaalLocatie)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtZaalAantalPlaatsen, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(lblFilmTitel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtVoorstellingPrijs))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(dchVoorstellingDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(64, 64, 64)
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtVoorstellingTijdstip, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(189, 189, 189)
@@ -195,7 +250,7 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -205,14 +260,17 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
                                     .addComponent(jLabel7)
                                     .addComponent(txtVoorstellingTijdstip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel3)
                                     .addComponent(txtFilmID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jCheckBox1))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(txtFilmTitel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel3)
+                                    .addComponent(chk3DFilm))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jLabel4))
+                                    .addComponent(lblFilmTitel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel5)
@@ -237,24 +295,19 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(lblFilmFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(39, 39, 39)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPrintTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(1, 1, 1)
+                        .addGap(2, 2, 2)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtTotaalPrijs, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTotaalPrijs, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnPrintTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        balieVoorstellingTabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
@@ -264,12 +317,12 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+        balieVoorstellingTabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTable1MouseClicked(evt);
+                balieVoorstellingTabelMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane2.setViewportView(balieVoorstellingTabel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -279,27 +332,172 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        setSize(new java.awt.Dimension(1020, 597));
+        setSize(new java.awt.Dimension(1020, 625));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+    private void balieVoorstellingTabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_balieVoorstellingTabelMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTable1MouseClicked
+        lblTotaalPrijs.setText(null);
+        int rij = balieVoorstellingTabel.getSelectedRow();
+        try {
+            txtFilmID.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 0).toString());
+            lblFilmTitel.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 1).toString());
+            String is3D = ((String)balieVoorstellingTabel.getModel().getValueAt(rij, 2).toString());
+            if (is3D.equals("true")){
+                chk3DFilm.setSelected(true);
+            }
+            else{
+                chk3DFilm.setSelected(false);
+            }
+            txtZaalLocatie.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 3).toString());
+            txtZaalAantalPlaatsen.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 4).toString());
+            dchVoorstellingDatum.setDate((Date)balieVoorstellingTabel.getModel().getValueAt(rij, 5));
+            txtVoorstellingTijdstip.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 6).toString());
+            txtVoorstellingPrijs.setText(balieVoorstellingTabel.getModel().getValueAt(rij, 7).toString());
+            FotoOpvragen(Integer.parseInt(txtFilmID.getText()));
+            int aantalPlaatsen = Integer.parseInt(txtZaalAantalPlaatsen.getText());
+            if( aantalPlaatsen > 0){
+                spAantalTickets.setEnabled(true);
+            }
+            
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Mislukt om gegegevens weer te geven.");
+        }
+        
+        double prijs = Double.parseDouble(txtVoorstellingPrijs.getText());
+        int aantal = (Integer) spAantalTickets.getValue();
+        
+        double totaalPrijs = prijs * aantal;
+        lblTotaalPrijs.setText("" + totaalPrijs);
+        if((int)spAantalTickets.getValue()>0){
+        btnPrintTicket.setEnabled(true);
+        }
+        else {
+          btnPrintTicket.setEnabled(false);
+        }
+        
+    }//GEN-LAST:event_balieVoorstellingTabelMouseClicked
 
+    private void spAantalTicketsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spAantalTicketsStateChanged
+        // TODO add your handling code here:
+        double prijs = Double.parseDouble(txtVoorstellingPrijs.getText());
+        int aantal = (Integer) spAantalTickets.getValue();
+        
+        double totaalPrijs = prijs * aantal;
+        lblTotaalPrijs.setText("" + totaalPrijs);
+        if((int)spAantalTickets.getValue()>0){
+        btnPrintTicket.setEnabled(true);
+        }
+        else {
+          btnPrintTicket.setEnabled(false);
+        }
+        
+    }//GEN-LAST:event_spAantalTicketsStateChanged
+
+    private void btnPrintTicketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintTicketActionPerformed
+        // TODO add your handling code here:
+        conn = Connectie.connect();
+        
+        try{
+            String sql="update zalen set AantalPlaatsen = AantalPlaatsen-'"+(int)spAantalTickets.getValue()+"'"
+                        + "where Locatie='" + txtZaalLocatie.getText() + "'";
+            st = conn.createStatement();
+            st.execute(sql);
+            vulVoorstellingTabel();  
+            
+                txtaPrintTicket.append("--------------------------------------------------------------------");
+                txtaPrintTicket.setText("Kinepolis Group nv" + "\n");
+                txtaPrintTicket.append("Titel: " + lblFilmTitel.getText() + "\n");
+                txtaPrintTicket.append("Datum: " + dchVoorstellingDatum.getDate().toString() + "\n");
+                txtaPrintTicket.append("Tijdstip: " + txtVoorstellingTijdstip.getText() + "\n");
+                txtaPrintTicket.append("Locatie: " + txtZaalLocatie.getText() + "\n");
+                txtaPrintTicket.append("Totaalprijs: " + lblTotaalPrijs.getText() + " € \n");
+                txtaPrintTicket.append("Aantal personen: " + (Integer)spAantalTickets.getValue()+ "\n");
+                txtaPrintTicket.append("\n");
+                txtaPrintTicket.append("--------------------------------------------------------------------");
+                            
+            txtaPrintTicket.print();
+                        
+        }catch (Exception ex) {
+             JOptionPane.showMessageDialog(null, "Printen van ticket mislukt.");
+        }
+        
+        
+    }//GEN-LAST:event_btnPrintTicketActionPerformed
+
+        
+    void vulVoorstellingTabel(){
+        try {
+        
+        
+         conn = Connectie.connect();
+        
+
+    Vector kolomNamen = new Vector(); 
+    Vector gegevens = new Vector();  
+          
+            String sql = "select films.FilmID,Titel,3D,"
+                    + "Locatie,AantalPlaatsen," + "voorstellingen.Datum,Tijdstip,Prijs from films,zalen,voorstellingen"+
+                    "  where films.FilmID=voorstellingen.FilmID and zalen.ZaalID=voorstellingen.ZaalID order by Datum,Tijdstip";
+              st=conn.createStatement();
+              rs=st.executeQuery(sql);  
+             ResultSetMetaData metaData = rs.getMetaData();  
+              int kolommen = metaData.getColumnCount(); 
+               for (int i = 1; i <= kolommen; i++) {               
+                 kolomNamen.addElement(metaData.getColumnName(i));    
+               }
+                while (rs.next()) {               
+                    Vector row = new Vector(kolommen);   
+                    for (int i = 1; i <= kolommen; i++) { 
+                        row.addElement(rs.getObject(i));  
+                }                
+                gegevens.addElement(row);
+                 
+                }
+             dtm=new DefaultTableModel(gegevens, kolomNamen);  
+        balieVoorstellingTabel.setModel(dtm);
+
+            
+      
+    } 
+    catch (Exception e) {
+    
+           JOptionPane.showMessageDialog(null, "Mislukt om voorstelling tabel te vullen.");
+    }
+    }
+    
+    void FotoOpvragen(int id){
+        conn = kinepolisswingapplicatie.Connectie.connect();
+        String sql ="select Foto from films where FilmID='"+id+"'";
+        
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            while(rs.next()){
+               Image im = ImageIO.read(rs.getBinaryStream("Foto"));
+               Image im1 = im.getScaledInstance(lblFilmFoto.getHeight(), lblFilmFoto.getWidth(), WIDTH);
+               lblFilmFoto.setIcon(new ImageIcon(im1));
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Foto ophalen mislukt");
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -336,9 +534,10 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable balieVoorstellingTabel;
     private javax.swing.JButton btnPrintTicket;
+    private javax.swing.JCheckBox chk3DFilm;
     private com.toedter.calendar.JDateChooser dchVoorstellingDatum;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel3;
@@ -350,15 +549,16 @@ public class BalieMedewerkerScherm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblFilmFoto;
+    private javax.swing.JLabel lblFilmTitel;
+    private javax.swing.JLabel lblTotaalPrijs;
     private javax.swing.JSpinner spAantalTickets;
     private javax.swing.JTextField txtFilmID;
-    private javax.swing.JTextField txtFilmTitel;
-    private javax.swing.JTextField txtTotaalPrijs;
     private javax.swing.JTextField txtVoorstellingPrijs;
     private javax.swing.JTextField txtVoorstellingTijdstip;
     private javax.swing.JTextField txtZaalAantalPlaatsen;
     private javax.swing.JTextField txtZaalLocatie;
+    private javax.swing.JTextArea txtaPrintTicket;
     // End of variables declaration//GEN-END:variables
 }

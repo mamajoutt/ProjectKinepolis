@@ -5,6 +5,7 @@
  */
 package UI;
 
+import Services.CheckInputZalen;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +28,7 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
     PreparedStatement ps;
     DefaultTableModel dtm;
     BeheerderScherm beheerderScherm = new BeheerderScherm();
-    
+    CheckInputZalen checkInputZalen = new CheckInputZalen();
     
     /**
      * Creates new form ZalenBeherenScherm
@@ -269,6 +270,10 @@ public class ZalenBeherenScherm extends javax.swing.JFrame {
 
     private void btnZaalToevoegenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZaalToevoegenActionPerformed
         // TODO add your handling code here:
+        if(checkInputZalen.controleLocaties(txtLocatieZaalToevoegen.getText())==true){
+             JOptionPane.showMessageDialog(null,"Zaal bestaat al in de lijst!","ok",JOptionPane.ERROR_MESSAGE);
+             return;
+        }
         IDOpvragen();
         try {
             conn = kinepolisswingapplicatie.Connectie.connect();

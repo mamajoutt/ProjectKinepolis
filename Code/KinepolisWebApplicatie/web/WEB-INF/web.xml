@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <servlet>
+        <servlet-name>ToevoegenServlet</servlet-name>
+        <servlet-class>Controller.ToevoegenServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>WijzigenServlet</servlet-name>
+        <servlet-class>Controller.WijzigenServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VerwijderenServlet</servlet-name>
+        <servlet-class>Controller.VerwijderenServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ToevoegenServlet</servlet-name>
+        <url-pattern>/Toevoegen</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WijzigenServlet</servlet-name>
+        <url-pattern>/Wijzigen</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VerwijderenServlet</servlet-name>
+        <url-pattern>/Verwijderen</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>
