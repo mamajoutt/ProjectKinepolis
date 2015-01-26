@@ -29,7 +29,7 @@ public class InlogScherm extends javax.swing.JFrame {
      */
     public InlogScherm() {
         initComponents();
-        maakVerbindingDatabase();
+        
     }
 
     /**
@@ -49,6 +49,7 @@ public class InlogScherm extends javax.swing.JFrame {
         btnAfsluiten = new javax.swing.JButton();
         txtPaswoordInloggen = new javax.swing.JPasswordField();
         lblDBConnectiviteit = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 204));
@@ -85,6 +86,8 @@ public class InlogScherm extends javax.swing.JFrame {
         lblDBConnectiviteit.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         lblDBConnectiviteit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/kinepolisHoofding.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -107,13 +110,18 @@ public class InlogScherm extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtPaswoordInloggen, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
                             .addComponent(txtAccountInloggen, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
-                            .addComponent(lblDBConnectiviteit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(lblDBConnectiviteit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(126, 126, 126)
+                        .addComponent(jLabel1)))
                 .addContainerGap(61, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(137, 137, 137)
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
                 .addComponent(lblAccount)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtAccountInloggen, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -183,9 +191,7 @@ public class InlogScherm extends javax.swing.JFrame {
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            lblDBConnectiviteit.setOpaque(true);
-            lblDBConnectiviteit.setBackground(Color.RED);
-            lblDBConnectiviteit.setText("DATABASE OFFLINE");
+            
 
         }
 
@@ -195,21 +201,7 @@ public class InlogScherm extends javax.swing.JFrame {
         // TODO add your handling code here:
         System.exit(0);
     }//GEN-LAST:event_btnAfsluitenActionPerformed
-
-    void maakVerbindingDatabase(){
-        try {
-            conn = Connectie.connect();
-            
-            lblDBConnectiviteit.setOpaque(true);
-            lblDBConnectiviteit.setBackground(Color.GREEN);
-            lblDBConnectiviteit.setText("DATABASE ONLINE");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            lblDBConnectiviteit.setOpaque(true);
-            lblDBConnectiviteit.setBackground(Color.RED);
-            lblDBConnectiviteit.setText("DATABASE OFFLINE");
-        }
-    }
+    
     
     /**
      * @param args the command line arguments
@@ -249,6 +241,7 @@ public class InlogScherm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAfsluiten;
     private javax.swing.JButton btnInloggen;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccount;
     private javax.swing.JLabel lblDBConnectiviteit;
